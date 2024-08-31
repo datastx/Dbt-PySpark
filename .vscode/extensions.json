@@ -1,0 +1,13 @@
+{
+    "recommendations": [
+        "ms-python.python",
+        "ms-azuretools.vscode-docker",
+        "esbenp.prettier-vscode",
+        "ms-vscode.cpptools",
+        "ms-python.vscode-pylance",
+        "eamodio.gitlens",
+        "editorconfig.editorconfig",
+        "ms-vscode.makefile-tools",
+        "innoverio.vscode-dbt-power-user"
+    ]
+}
