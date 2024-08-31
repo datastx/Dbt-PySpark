@@ -1,0 +1,13 @@
+pragmint:
+  outputs:
+    dev:
+      type: spark
+      method: thrift
+      host: localhost
+      port: 10000
+      user: dbt
+      schema: analytics
+      connect_retries: 5
+      connect_timeout: 60
+      retry_all: true
+  target: dev
