@@ -53,7 +53,7 @@ spark-up:
 		-p 4040:4040 -p 10000:10000 \
 		-v $(LOCAL_SPARK_DIR):/opt/spark/work-dir \
 		$(SPARK_IMAGE) \
-		/bin/bash -c "/opt/spark/bin/spark-class org.apache.spark.deploy.master.Master -h 0.0.0.0 & /opt/spark/sbin/start-thriftserver.sh & tail -f /dev/null"
+		/bin/bash -c "/opt/spark/bin/spark-class org.apache.spark.deploy.master.Master -h 0.0.0.0 & sleep 5 && /opt/spark/sbin/start-thriftserver.sh & tail -f /dev/null"
 	@echo "Starting $(NUM_WORKERS) worker(s)..."
 	@for i in $$(seq 1 $(NUM_WORKERS)); do \
 		docker run -d --name $(CONTAINER_NAME)-worker-$$i \
@@ -62,6 +62,9 @@ spark-up:
 			$(SPARK_IMAGE) \
 			/opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077; \
 	done
+	@echo "Waiting for Thrift server to start..."
+	@sleep 10
+	@docker exec $(CONTAINER_NAME) netstat -tulpn | grep 10000 || echo "Warning: Thrift server may not have started correctly"
 
 # Stop the Spark cluster
 spark-down:
