@@ -12,14 +12,14 @@ CONTAINER_NAME := my-spark-container
 # Define the local directory to mount
 LOCAL_SPARK_DIR := $(shell pwd)/spark_scripts
 
-# Check if the UV binary exists
+# Check if the UV binary exists and install if necessary
 .PHONY: uv
 uv:
 	@if [ ! -f $(UV_BIN) ]; then \
 		curl -LsSf https://astral.sh/uv/install.sh | sh; \
-		echo "Make sure to add $$(dirname $(UV_BIN)) to your PATH or source the environment:"; \
-		echo "  source $$HOME/.cargo/env (sh, bash, zsh)"; \
-		echo "  source $$HOME/.cargo/env.fish (fish)"; \
+		echo "UV installed. Adding to PATH..."; \
+		echo 'export PATH="$$HOME/.cargo/bin:$$PATH"' >> ~/.bashrc; \
+		export PATH="$$HOME/.cargo/bin:$$PATH"; \
 	fi
 
 # Install dependencies and create a requirements.txt from requirements.in
@@ -40,6 +40,7 @@ venv: uv requirements.txt
 	$(VENV_DIR)/bin/pip install -r requirements.txt
 
 # Default target that ensures everything is set up
+.PHONY: all
 all: venv
 
 # Clean up the virtual environment and requirements.txt
