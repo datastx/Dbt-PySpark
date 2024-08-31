@@ -21,9 +21,13 @@ requirements.txt: requirements.in uv
 venv: uv requirements.txt
 	@if [ ! -d $(VENV_DIR) ]; then \
 		$(UV_BIN) venv $(VENV_DIR); \
-		$(VENV_DIR)/bin/pip install -r requirements.txt; \
-		touch $(VENV_DIR)/bin/activate; \
 	fi
+	# Check if pip exists, if not use python to install pip
+	@if [ ! -f $(VENV_DIR)/bin/pip ]; then \
+		$(VENV_DIR)/bin/python -m ensurepip; \
+		$(VENV_DIR)/bin/python -m pip install --upgrade pip setuptools; \
+	fi
+	$(VENV_DIR)/bin/pip install -r requirements.txt
 
 # Default target that ensures everything is set up
 all: venv

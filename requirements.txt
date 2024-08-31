@@ -26,17 +26,24 @@ colorama==0.4.6
 daff==1.3.46
     # via dbt-core
 dbt-adapters==1.4.1
-    # via dbt-core
+    # via
+    #   dbt-core
+    #   dbt-spark
 dbt-common==1.7.0
     # via
     #   dbt-adapters
     #   dbt-core
+    #   dbt-spark
 dbt-core==1.8.6
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   dbt-spark
 dbt-extractor==0.5.1
     # via dbt-core
 dbt-semantic-interfaces==0.5.1
     # via dbt-core
+dbt-spark==1.8.0
+    # via -r requirements.in
 deepdiff==7.0.1
     # via dbt-common
 idna==3.8
@@ -136,6 +143,8 @@ six==1.16.0
     #   python-dateutil
 sqlglot==25.18.0
     # via -r requirements.in
+sqlparams==6.1.0
+    # via dbt-spark
 sqlparse==0.5.1
     # via dbt-core
 text-unidecode==1.3

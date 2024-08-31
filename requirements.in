@@ -1,3 +1,4 @@
 pyspark
 dbt-core
 sqlglot
+dbt-spark
