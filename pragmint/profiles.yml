@@ -1,13 +1,13 @@
 pragmint:
+  target: dev
   outputs:
     dev:
       type: spark
       method: thrift
+      schema: default
       host: localhost
       port: 10000
-      user: dbt
-      schema: analytics
-      connect_retries: 5
-      connect_timeout: 60
-      retry_all: true
-  target: dev
+      user: # leave this blank if no user authentication is required
+      auth: # leave this blank if no authentication is required
+      kerberos_service_name: # leave this blank if not using Kerberos
+      use_ssl: false
