@@ -34,7 +34,7 @@ all: venv
 
 # Clean up the virtual environment and requirements.txt
 clean:
-	rm -rf $(VENV_DIR) requirements.txt
+	rm -rf $(VENV_DIR) requirements.txt logs
 
 # Help command to display available targets
 help:
@@ -44,3 +44,4 @@ help:
 	@echo "  make help       Show this help message"
 
 .PHONY: all clean help
+

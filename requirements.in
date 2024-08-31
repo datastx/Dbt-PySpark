@@ -1,4 +1,4 @@
 pyspark
 dbt-core
 sqlglot
-dbt-spark
+dbt-spark[PyHive]
