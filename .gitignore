@@ -166,3 +166,9 @@ cython_debug/
 .spark-warehouse
 spark_scripts
 spark-master
+
+
+target/
+dbt_packages/
+logs/
+target
