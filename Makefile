@@ -109,6 +109,10 @@ spark-run-job:
 		/opt/spark/examples/jars/spark-examples_*.jar \
 		10
 
+docs:
+	dbt docs generate 
+	dbt docs serve
+
 # Help command to display available targets
 help:
 	@echo "Usage:"

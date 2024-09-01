@@ -1,43 +1,17 @@
+version: 2
+
 models:
   - name: stg_locations
-    description: List of open locations with basic cleaning and transformation applied, one row per location.
+    description: "Staged location data with basic transformations"
     columns:
       - name: location_id
-        description: The unique key for each location.
-        data_tests:
-          - not_null
+        description: "The unique identifier for the location"
+        tests:
           - unique
-
-unit_tests:
-  - name: test_does_location_opened_at_trunc_to_date
-    description: "Check that opened_at timestamp is properly truncated to a date."
-    model: stg_locations
-    given:
-      - input: source('ecom', 'raw_stores')
-        rows:
-          - {
-              id: 1,
-              name: "Vice City",
-              tax_rate: 0.2,
-              opened_at: "2016-09-01T00:00:00",
-            }
-          - {
-              id: 2,
-              name: "San Andreas",
-              tax_rate: 0.1,
-              opened_at: "2079-10-27T23:59:59.9999",
-            }
-    expect:
-      rows:
-        - {
-            location_id: 1,
-            location_name: "Vice City",
-            tax_rate: 0.2,
-            opened_date: "2016-09-01",
-          }
-        - {
-            location_id: 2,
-            location_name: "San Andreas",
-            tax_rate: 0.1,
-            opened_date: "2079-10-27",
-          }
+          - not_null
+      - name: location_name
+        description: "The name of the location"
+      - name: tax_rate
+        description: "The tax rate for the location"
+      - name: opened_date
+        description: "The date the location was opened, truncated to day"

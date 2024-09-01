@@ -5,4 +5,6 @@ packages:
     version: 0.10.0
   - git: https://github.com/dbt-labs/dbt-audit-helper.git
     revision: c0be07f84e61dd01517292a15a2c084af9c95f01
-sha1_hash: da0d5b1d5a48f6504805f6b1d5a0b2f9f233f34c
+  - package: brooklyn-data/dbt_artifacts
+    version: 2.6.4
+sha1_hash: 380bfeb39f438185a062eab27f1b6e82459065d6
