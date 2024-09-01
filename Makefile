@@ -2,19 +2,14 @@
 UV_BIN := $(HOME)/.cargo/bin/uv
 VENV_DIR := .venv
 
-# Default number of workers
-NUM_WORKERS ?= 2
-
-# Default resource allocation for workers
-WORKER_CORES ?= 2
-WORKER_MEMORY ?= 2g
-
-# Spark Docker image and container name
-SPARK_IMAGE := spark:3.5.2-scala2.12-java11-python3-ubuntu
-CONTAINER_NAME := my-spark-container
+COMPOSE_PROJECT_NAME := spark-cluster
 
 # Define the local directory to mount
 LOCAL_SPARK_DIR := $(shell pwd)/spark_scripts
+
+# Determine the correct Docker Compose command
+DOCKER_COMPOSE := $(shell command -v docker-compose 2> /dev/null || echo "docker compose")
+
 
 # Check if the UV binary exists
 .PHONY: uv
@@ -49,46 +44,27 @@ all: venv
 # Clean up the virtual environment and requirements.txt
 clean:
 	rm -rf $(VENV_DIR) requirements.txt logs target spark_scripts dbt_packages
+	docker-compose.yml down -v
 
-# Start the Spark cluster with volume mount and Thrift server
 spark-up:
 	mkdir -p $(LOCAL_SPARK_DIR)
-	docker run -d --name $(CONTAINER_NAME) \
-		-p 4040:4040 -p 10000:10000 \
-		-v $(LOCAL_SPARK_DIR):/opt/spark/work-dir \
-		$(SPARK_IMAGE) \
-		/bin/bash -c "/opt/spark/bin/spark-class org.apache.spark.deploy.master.Master -h 0.0.0.0 & sleep 5 && /opt/spark/sbin/start-thriftserver.sh & tail -f /dev/null"
-	@echo "Starting $(NUM_WORKERS) worker(s) with $(WORKER_CORES) cores and $(WORKER_MEMORY) memory each..."
-	@for i in $$(seq 1 $(NUM_WORKERS)); do \
-		docker run -d --name $(CONTAINER_NAME)-worker-$$i \
-			--link $(CONTAINER_NAME):spark-master \
-			-v $(LOCAL_SPARK_DIR):/opt/spark/work-dir \
-			$(SPARK_IMAGE) \
-			/opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker \
-			-c $(WORKER_CORES) -m $(WORKER_MEMORY) \
-			spark://spark-master:7077; \
-	done
-	@echo "Waiting for Thrift server to start..."
+	@echo "Using Docker Compose command: $(DOCKER_COMPOSE)"
+	$(DOCKER_COMPOSE) up -d
+	@echo "Waiting for services to start..."
 	@sleep 10
-	@docker exec $(CONTAINER_NAME) netstat -tulpn | grep 10000 || echo "Warning: Thrift server may not have started correctly"
+	$(DOCKER_COMPOSE) exec spark-master bash -c "netstat -tulpn | grep 10000" || echo "Warning: Thrift server may not have started correctly"
 
 # Stop the Spark cluster
 spark-down:
-	@echo "Stopping Spark cluster..."
-	@docker stop $(CONTAINER_NAME) || true
-	@docker rm $(CONTAINER_NAME) || true
-	@for i in $$(seq 1 $(NUM_WORKERS)); do \
-		docker stop $(CONTAINER_NAME)-worker-$$i || true; \
-		docker rm $(CONTAINER_NAME)-worker-$$i || true; \
-	done
+	$(DOCKER_COMPOSE) down
 
 # Open a Spark shell
 spark-shell:
-	docker exec -it $(CONTAINER_NAME) /opt/spark/bin/spark-shell
+	$(DOCKER_COMPOSE) exec spark-master /opt/spark/bin/spark-shell
 
 # Open a PySpark shell
 pyspark:
-	docker exec -it $(CONTAINER_NAME) /opt/spark/bin/pyspark
+	$(DOCKER_COMPOSE) exec spark-master /opt/spark/bin/pyspark
 
 # Run a local PySpark script
 spark-run:
@@ -100,12 +76,12 @@ spark-run:
 		echo "Error: Script file $(SCRIPT) not found."; \
 		exit 1; \
 	fi
-	docker exec -it $(CONTAINER_NAME) /opt/spark/bin/spark-submit /opt/spark/work-dir/$(notdir $(SCRIPT))
+	$(DOCKER_COMPOSE) exec spark-master /opt/spark/bin/spark-submit /opt/spark/work-dir/$(notdir $(SCRIPT))
 
 # Run a Spark job (example)
 spark-run-job:
-	docker exec -it $(CONTAINER_NAME) /opt/spark/bin/spark-submit --class org.apache.spark.examples.SparkPi \
-		--master local[*] \
+	$(DOCKER_COMPOSE) exec spark-master /opt/spark/bin/spark-submit --class org.apache.spark.examples.SparkPi \
+		--master spark://spark-master:7077 \
 		/opt/spark/examples/jars/spark-examples_*.jar \
 		10
 
@@ -117,9 +93,8 @@ docs:
 help:
 	@echo "Usage:"
 	@echo "  make            Create the virtual environment and install dependencies"
-	@echo "  make clean      Remove the virtual environment and requirements.txt"
-	@echo "  make spark-up   Start the Spark cluster with the specified number of workers and resources"
-	@echo "                  Example: make spark-up NUM_WORKERS=3 WORKER_CORES=4 WORKER_MEMORY=4g"
+	@echo "  make clean      Remove the virtual environment, requirements.txt, and stop Docker containers"
+	@echo "  make spark-up   Start the Spark cluster using Docker Compose"
 	@echo "  make spark-down Stop the Spark cluster"
 	@echo "  make spark-shell Open a Spark shell in the master container"
 	@echo "  make pyspark    Open a PySpark shell in the master container"

@@ -4,10 +4,9 @@ pragmint:
     dev:
       type: spark
       method: thrift
-      schema: default
       host: localhost
       port: 10000
-      user: # leave this blank if no user authentication is required
-      auth: # leave this blank if no authentication is required
-      kerberos_service_name: # leave this blank if not using Kerberos
-      use_ssl: false
+      schema: default
+      user: # leave blank unless you've set up authentication
+      pass: # leave blank unless you've set up authentication
+      use_ssl: False
