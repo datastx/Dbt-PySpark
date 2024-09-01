@@ -25,8 +25,6 @@ jobs:
     - name: Verify Docker is running
       run: docker info
 
-    - name: Start Spark Cluster
-      run: make spark-up
 
     - name: Set up Python 3.10
       uses: actions/setup-python@v3
@@ -39,5 +37,6 @@ jobs:
 
     - name: Test dbt
       run: |
+        make spark-up
         source .venv/bin/activate
         dbt debug
