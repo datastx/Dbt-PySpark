@@ -8,6 +8,7 @@
         "eamodio.gitlens",
         "editorconfig.editorconfig",
         "ms-vscode.makefile-tools",
-        "innoverio.vscode-dbt-power-user"
+        "innoverio.vscode-dbt-power-user",
+        "mshdinsight.azure-hdinsight"
     ]
 }

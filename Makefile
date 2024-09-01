@@ -5,6 +5,10 @@ VENV_DIR := .venv
 # Default number of workers
 NUM_WORKERS ?= 2
 
+# Default resource allocation for workers
+WORKER_CORES ?= 2
+WORKER_MEMORY ?= 2g
+
 # Spark Docker image and container name
 SPARK_IMAGE := spark:3.5.2-scala2.12-java11-python3-ubuntu
 CONTAINER_NAME := my-spark-container
@@ -54,13 +58,15 @@ spark-up:
 		-v $(LOCAL_SPARK_DIR):/opt/spark/work-dir \
 		$(SPARK_IMAGE) \
 		/bin/bash -c "/opt/spark/bin/spark-class org.apache.spark.deploy.master.Master -h 0.0.0.0 & sleep 5 && /opt/spark/sbin/start-thriftserver.sh & tail -f /dev/null"
-	@echo "Starting $(NUM_WORKERS) worker(s)..."
+	@echo "Starting $(NUM_WORKERS) worker(s) with $(WORKER_CORES) cores and $(WORKER_MEMORY) memory each..."
 	@for i in $$(seq 1 $(NUM_WORKERS)); do \
 		docker run -d --name $(CONTAINER_NAME)-worker-$$i \
 			--link $(CONTAINER_NAME):spark-master \
 			-v $(LOCAL_SPARK_DIR):/opt/spark/work-dir \
 			$(SPARK_IMAGE) \
-			/opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077; \
+			/opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker \
+			-c $(WORKER_CORES) -m $(WORKER_MEMORY) \
+			spark://spark-master:7077; \
 	done
 	@echo "Waiting for Thrift server to start..."
 	@sleep 10
@@ -108,8 +114,8 @@ help:
 	@echo "Usage:"
 	@echo "  make            Create the virtual environment and install dependencies"
 	@echo "  make clean      Remove the virtual environment and requirements.txt"
-	@echo "  make spark-up   Start the Spark cluster with the specified number of workers (default: 2)"
-	@echo "                  Example: make spark-up NUM_WORKERS=3"
+	@echo "  make spark-up   Start the Spark cluster with the specified number of workers and resources"
+	@echo "                  Example: make spark-up NUM_WORKERS=3 WORKER_CORES=4 WORKER_MEMORY=4g"
 	@echo "  make spark-down Stop the Spark cluster"
 	@echo "  make spark-shell Open a Spark shell in the master container"
 	@echo "  make pyspark    Open a PySpark shell in the master container"
