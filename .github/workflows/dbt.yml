@@ -33,9 +33,12 @@ jobs:
       with:
         python-version: "3.10"
 
-    - name: Install dependencies
+    - name: Install dependencies and activate virtual environment
       run: |
         make uv && make venv
+        echo "source .venv/bin/activate" >> $GITHUB_ENV
 
     - name: Test dbt
-      run: dbt debug
+      run: |
+        source .venv/bin/activate
+        dbt debug
