@@ -4,7 +4,7 @@ Welcome to your new dbt project!
 ### Installing
 - run `make`
 - open a new terminal and run `make venv`
-- run `make start-spark` and you're done!
+- run `make spark-up` and you're done!
 - You can test that you can submit pyspark jobs by running `python test_spark.py`
 - You can test that dbt is wired up by running `dbt debug`
 
@@ -13,8 +13,12 @@ Welcome to your new dbt project!
 ### Using the starter project
 
 Try running the following commands:
-- dbt run
-- dbt test
+- dbt build -m pragmint
+- dbt build -m pragmint
+- dbt run -m pragmint
+
+### Standing up the docs
+- run `make docs`
 
 
 ### Resources:
