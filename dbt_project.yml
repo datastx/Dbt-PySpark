@@ -25,15 +25,21 @@ clean-targets:         # directories to be removed by `dbt clean`
 
 # Configuring models
 # Full documentation: https://docs.getdbt.com/docs/configuring-models
-
-# In this example config, we tell dbt to build all models in the example/
-# directory as views. These settings can be overridden in the individual model
-# files using the `{{ config(...) }}` macro.
 models:
-  pragmint:
+  staging:
+    +materialized: view
+  marts:
+    +materialized: table
 
 seeds:
-  +schema: raw
+  pragmint:
+    +schema: raw
+    raw_stores:
+      +column_types:
+        id: string
+        name: string
+        tax_rate: float
+        opened_at: timestamp
 
 vars:
   "dbt_date:time_zone": "America/Los_Angeles"
