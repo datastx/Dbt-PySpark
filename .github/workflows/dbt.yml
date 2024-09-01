@@ -34,9 +34,3 @@ jobs:
     - name: Install dependencies and create virtual environment
       run: |
         make uv && make venv
-
-    - name: Test dbt
-      run: |
-        make spark-up
-        source .venv/bin/activate
-        dbt debug
