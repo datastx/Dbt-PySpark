@@ -10,4 +10,5 @@
         "VIRTUAL_ENV": "${workspaceFolder}/.venv",
         "PATH": "${workspaceFolder}/.venv/bin:${env:PATH}"
     },
+    "dbt.enableNewLineagePanel": true,
 }

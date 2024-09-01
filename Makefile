@@ -48,7 +48,7 @@ all: venv
 
 # Clean up the virtual environment and requirements.txt
 clean:
-	rm -rf $(VENV_DIR) requirements.txt pragmint/logs pragmint/target
+	rm -rf $(VENV_DIR) requirements.txt logs target spark_scripts dbt_packages
 
 # Start the Spark cluster with volume mount and Thrift server
 spark-up:
