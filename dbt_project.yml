@@ -31,6 +31,9 @@ clean-targets:         # directories to be removed by `dbt clean`
 # files using the `{{ config(...) }}` macro.
 models:
   pragmint:
-    # Config indicated by + and applies to all files under models/example/
-    example:
-      +materialized: view
+
+seeds:
+  +schema: raw
+
+vars:
+  "dbt_date:time_zone": "America/Los_Angeles"
